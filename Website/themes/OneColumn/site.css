@@ -19,6 +19,8 @@ body {
     margin: 0;
 }
 
+
+
 img, video, iframe {
     max-width: 100%;
 }
@@ -96,6 +98,10 @@ input[type], button, textarea {
 
 .post abbr {
     border: none;
+}
+
+.post h1 {
+    font-size: 2em;
 }
 
 .post h2 {

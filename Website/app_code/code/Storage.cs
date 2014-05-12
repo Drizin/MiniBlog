@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Web;
 using System.Web.Hosting;
 using System.Xml.Linq;
@@ -12,6 +13,11 @@ public static class Storage
 
     public static List<Post> GetAllPosts()
     {
+        if (HttpRuntime.Cache["oldPostMap"] == null)
+        {
+            LoadOldPostMap();
+        }
+
         if (HttpRuntime.Cache["posts"] == null)
             LoadPosts();
 
@@ -82,6 +88,44 @@ public static class Storage
         string file = Path.Combine(_folder, post.ID + ".xml");
         File.Delete(file);
         posts.Remove(post);
+    }
+
+    public static Post GetOldPost(string url)
+    {
+        var map = GetOldPostMap();
+        if (map.ContainsKey(url))
+        {
+            return GetAllPosts().SingleOrDefault(p => p.ID == map[url]);
+        }
+        return null;
+    }
+
+    public static Dictionary<string, string> GetOldPostMap()
+    {
+        GetAllPosts();
+
+        if (HttpRuntime.Cache["oldPostMap"] != null)
+        {
+            return (Dictionary<string, string>)HttpRuntime.Cache["oldPostMap"];
+        }
+        return new Dictionary<string, string>();
+    }
+
+    private static void LoadOldPostMap()
+    {
+        var map = new Dictionary<string, string>();
+        var mapFile = Path.Combine(_folder, "oldPosts.map");
+        if (File.Exists(mapFile))
+        {
+            var doc = XDocument.Load(mapFile);
+            foreach (var mapping in doc.Descendants("OldPost"))
+            {
+                var oldUrl = mapping.Attribute("oldUrl").Value;
+                var newId = mapping.Attribute("postId").Value;
+                map[oldUrl] = newId;
+            }
+        }
+        HttpRuntime.Cache.Insert("oldPostMap", map);
     }
 
     private static void LoadPosts()
@@ -177,4 +221,6 @@ public static class Storage
 
         return defaultValue;
     }
+
+
 }
