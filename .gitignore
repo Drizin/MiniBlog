@@ -37,6 +37,7 @@ local.properties
 
 credentials.config
 smtp.config
+Website/posts/
 
 
 ## Ignore Visual Studio temporary files, build results, and
