@@ -1,3 +1,14 @@
+# MiniBlog - www.gregpakes.co.uk
+
+My fork of MiniBlog.
+
+## Added Features
+
+- Google Analytics Support
+- Basic URL mapping system from wordpress.  Maps old blog URLs to new location.
+- Slight styling tweaks
+- SyntaxHighlighter support
+
 # MiniBlog
 
 A blogging engine based on HTML5 and ASP.NET.
@@ -5,7 +16,6 @@ A blogging engine based on HTML5 and ASP.NET.
 __Live demo__: http://miniblog.azurewebsites.net/  
 Username: _demo_  
 Password: _demo_  
-
 
 ## Simple, flexible and powerful
 
