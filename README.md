@@ -9,6 +9,8 @@ My fork of MiniBlog.
 - Slight styling tweaks
 - SyntaxHighlighter support
 
+----
+
 # MiniBlog
 
 A blogging engine based on HTML5 and ASP.NET.
