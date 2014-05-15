@@ -1,6 +1,6 @@
 # MiniBlog - www.gregpakes.co.uk
 
-My fork of MiniBlog.
+Fork of MiniBlog that is running my site: www.gregpakes.co.uk.  I have made some minor customisations to it, they are outlined below.
 
 ## Added Features
 
