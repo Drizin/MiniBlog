@@ -8,6 +8,8 @@ Fork of MiniBlog that is running my site: www.gregpakes.co.uk.  I have made some
 - Basic URL mapping system from wordpress.  Maps old blog URLs to new location.
 - Slight styling tweaks
 - SyntaxHighlighter support
+- Disqus support
+- Basic framework to support any comment engine
 
 ----
 
