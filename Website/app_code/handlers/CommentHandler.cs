@@ -12,7 +12,7 @@ public class CommentHandler : IHttpHandler
     public void ProcessRequest(HttpContext context)
     {
         // Disable the CommentHandler if the inbuilt comment engine is not being used.
-        if (Blog.CommentEngine.ToLower() != "inbuilt")
+        if (Blog.CommentEngine.Name.ToLower() != "inbuilt")
         {
             throw new HttpException(400, "The inbuilt comment engine is disabled.");
         }

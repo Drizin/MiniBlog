@@ -21,8 +21,8 @@ public static class Blog
         ModerateComments = bool.Parse(ConfigurationManager.AppSettings.Get("blog:moderateComments"));
         GoogleAnalyticsId = ConfigurationManager.AppSettings.Get("blog:googleAnalyticsId");
         GoogleAnalyticsDomain = ConfigurationManager.AppSettings.Get("blog:googleAnalyticsDomain");
-        CommentEngine = ConfigurationManager.AppSettings.Get("blog:commentEngine");
-        DisqusShortName = ConfigurationManager.AppSettings.Get("disqus:shortname");
+
+        CommentEngine = CommentEngineFactory.Create(ConfigurationManager.AppSettings.Get("blog:commentEngine"));
     }
 
     public static string Title { get; private set; }
@@ -34,9 +34,7 @@ public static class Blog
     public static bool ModerateComments { get; private set; }
     public static string GoogleAnalyticsId { get; set; }
     public static string GoogleAnalyticsDomain { get; set; }
-    public static string CommentEngine { get; set; }
-    public static string DisqusShortName { get; set; }
-
+    public static ICommentEngine CommentEngine { get; set; }
 
     public static bool IsGoogleAnalyticsConfigured
     {

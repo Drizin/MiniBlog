@@ -74,17 +74,10 @@ public class Post
         return (Blog.ModerateComments && !context.User.Identity.IsAuthenticated) ? this.Comments.Count(c => c.IsApproved) : this.Comments.Count;
     }
 
-    public Uri GetCommentUri()
-    {
-        var hashComment = "comments";
-
-        if (Blog.CommentEngine.ToLower() == "disqus")
-        {
-            hashComment = "disqus_thread ";
-        }
-
-        var uri = new Uri(VirtualPathUtility.ToAbsolute("~/post/" + Slug + "#" + hashComment), UriKind.Relative);
-        return uri;
-
-    }
+    //public Uri GetCommentUri()
+    //{
+    //    var hashComment = Blog.CommentEngine.GetCommentUriHash();
+    //    var uri = new Uri(VirtualPathUtility.ToAbsolute("~/post/" + Slug + "#" + hashComment), UriKind.Relative);
+    //    return uri;
+    //}
 }

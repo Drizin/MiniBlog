@@ -44,6 +44,8 @@
 	
 	@AntiForgery.GetHtml()
 
+    @Blog.CommentEngine.RenderGlobalSection(HttpContext.Current)
+    
     if (!Request.IsLocal)
     {
         Response.Cache.AppendCacheExtension("max-age=0");
