@@ -99,7 +99,7 @@ public abstract class CommentEngineBase : ICommentEngine
     /// <returns><see cref="HelperResult"/></returns>
     public HelperResult RenderCommentCountSection(Post post, HttpContext context)
     {
-        return RenderHelperResult(CommentCountSectionPath, new CommentCount(1, post.Url), context);
+        return RenderHelperResult(CommentCountSectionPath, new CommentCount(CountApprovedComments(post, new HttpContextWrapper(context)), post.Url), context);
     }
 
     /// <summary>
