@@ -1,0 +1,21 @@
+﻿@if (Model.ApprovedCommentCount > 0)
+{
+    <h2>Comments</h2>
+}
+
+<section id="comments" aria-label="Comments">
+    @foreach (Comment comment in Model.Comments)
+    {
+        if (comment.IsApproved || !Blog.ModerateComments || Context.User.Identity.IsAuthenticated)
+        {
+            @RenderPage("~/views/CommentEngines/inbuilt/comment.cshtml", comment)
+        }
+    }
+</section>
+
+@if (Model.CommentsOpen)
+{
+    @RenderPage("~/views/CommentForm.cshtml")
+}
+
+
