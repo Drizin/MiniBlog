@@ -3,9 +3,11 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
+using System.Linq;
 using System.Web;
 using System.Web.Compilation;
 using System.Web.WebPages;
+using System.Xml.Linq;
 
 public abstract class CommentEngineBase : ICommentEngine
 {
@@ -18,11 +20,6 @@ public abstract class CommentEngineBase : ICommentEngine
     /// Name of the comment engine
     /// </summary>
     public abstract string Name { get; }
-
-    /// <summary>
-    /// Hash that goes after the comment uri
-    /// </summary>
-    public abstract string CommentUriHash { get; }
 
     /// <summary>
     /// Path to the comment section.
@@ -89,8 +86,8 @@ public abstract class CommentEngineBase : ICommentEngine
         return RenderHelperResult(CommentSectionPath, new
         {
             Comments = post.Comments,
-            ApprovedCommentCount = post.CountApprovedComments(contextWrapper),
-            CommentsOpen = post.AreCommentsOpen(contextWrapper)
+            ApprovedCommentCount = this.CountApprovedComments(post, contextWrapper),
+            CommentsOpen = this.AreCommentsOpen(post, contextWrapper)
         }, context);
     }
 
@@ -102,7 +99,7 @@ public abstract class CommentEngineBase : ICommentEngine
     /// <returns><see cref="HelperResult"/></returns>
     public HelperResult RenderCommentCountSection(Post post, HttpContext context)
     {
-        return RenderHelperResult(CommentCountSectionPath, new CommentCount(1, GetCommentUri(post.Slug)), context);
+        return RenderHelperResult(CommentCountSectionPath, new CommentCount(1, post.Url), context);
     }
 
     /// <summary>
@@ -113,17 +110,6 @@ public abstract class CommentEngineBase : ICommentEngine
     public virtual HelperResult RenderGlobalSection(HttpContext context)
     {
         return RenderHelperResult(GlobalSectionPath, null, context);
-    }
-
-    /// <summary>
-    /// Returns the uri to the comments section
-    /// </summary>
-    /// <param name="slug"></param>
-    /// <returns></returns>
-    public Uri GetCommentUri(string slug)
-    {
-        var uri = new Uri(VirtualPathUtility.ToAbsolute("~/post/" + slug + "#" + CommentUriHash), UriKind.Relative);
-        return uri;
     }
 
     /// <summary>
@@ -153,6 +139,38 @@ public abstract class CommentEngineBase : ICommentEngine
             }
         }
         return string.Empty;
+    }
+
+    /// <summary>
+    /// Loads the comments and returns them
+    /// </summary>
+    /// <param name="doc"></param>
+    /// <returns></returns>
+    public virtual IEnumerable<Comment> LoadComments(XElement doc = null)
+    {
+        return new List<Comment>();
+    }
+
+    /// <summary>
+    /// Counts the approved comments
+    /// </summary>
+    /// <param name="post"></param>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    public virtual int CountApprovedComments(Post post, HttpContextBase context)
+    {
+        return post.Comments.Count(c => c.IsApproved);
+    }
+
+    /// <summary>
+    /// Whether comments are open
+    /// </summary>
+    /// <param name="post"></param>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    public virtual bool AreCommentsOpen(Post post, HttpContextBase context)
+    {
+        return true;
     }
 
     /// <summary>

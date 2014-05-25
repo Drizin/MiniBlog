@@ -102,7 +102,7 @@
     </footer>
 
 
-    @if ((Blog.CurrentPost != null && Blog.CurrentPost.AreCommentsOpen(Context)) || Blog.IsNewPost)
+    @if ((Blog.CurrentPost != null && Blog.CommentEngine.AreCommentsOpen(Blog.CurrentPost, Context)) || Blog.IsNewPost)
     {
         <script src="@Blog.FingerPrint("/scripts/comments.js")" async defer></script>
     }

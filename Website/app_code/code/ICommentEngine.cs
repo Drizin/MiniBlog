@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.Web;
 using System.Web.UI;
 using System.Web.WebPages;
+using System.Xml.Linq;
 
 /// <summary>
 /// Interface that represents a comment engine
@@ -16,11 +17,6 @@ public interface ICommentEngine
     /// Name of the comment engine
     /// </summary>
     string Name { get; }
-
-    /// <summary>
-    /// Hash that goes after the comment uri
-    /// </summary>
-    string CommentUriHash { get; }
 
     /// <summary>
     /// Path to the comment section.
@@ -64,17 +60,33 @@ public interface ICommentEngine
     HelperResult RenderGlobalSection(HttpContext context);
 
     /// <summary>
-    /// Returns the uri to the comments section
-    /// </summary>
-    /// <param name="slug"></param>
-    /// <returns></returns>
-    Uri GetCommentUri(string slug);
-
-    /// <summary>
     /// Gets settings related to the selected blog engine from the web.config and caches them.
     /// Convention: <add key="{name}:{key}" value="VALUE"/>
     /// </summary>
     /// <param name="key">Key to look for.  This key is concatenated with the comment engine name in the format: name:key</param>
     /// <returns>The setting vale</returns>
     string GetSetting(string key);
+
+    /// <summary>
+    /// Loads the comments and returns them
+    /// </summary>
+    /// <param name="doc"></param>
+    /// <returns></returns>
+    IEnumerable<Comment> LoadComments(XElement doc = null);
+
+    /// <summary>
+    /// Whether comments are open
+    /// </summary>
+    /// <param name="post"></param>
+    /// <param name="contextBase"></param>
+    /// <returns></returns>
+    bool AreCommentsOpen(Post post, HttpContextBase contextBase);
+
+    /// <summary>
+    /// Counts the approved comments
+    /// </summary>
+    /// <param name="post"></param>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    int CountApprovedComments(Post post, HttpContextBase context);
 }

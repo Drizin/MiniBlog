@@ -7,9 +7,4 @@ public class DisqusCommentEngine : CommentEngineBase
         get { return "Disqus"; }
     }
 
-    public override string CommentUriHash
-    {
-        get { return "disqus_thread"; }
-    }
-
 }

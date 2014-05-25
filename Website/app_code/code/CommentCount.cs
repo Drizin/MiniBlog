@@ -9,12 +9,12 @@ using System.Web;
 public class CommentCount
 {
     private readonly int _count;
-    private readonly Uri _uri;
+    private readonly Uri _url;
 
-    public CommentCount(int count, Uri uri)
+    public CommentCount(int count, Uri url)
     {
         _count = count;
-        _uri = uri;
+        _url = url;
     }
 
     public int Count
@@ -22,8 +22,8 @@ public class CommentCount
         get { return _count; }
     }
 
-    public Uri Uri
+    public Uri PostUri
     {
-        get { return _uri; }
+        get { return _url; }
     }
 }

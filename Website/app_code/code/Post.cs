@@ -64,20 +64,4 @@ public class Post
         }
     }
 
-    public bool AreCommentsOpen(HttpContextBase context)
-    {
-        return PubDate > DateTime.UtcNow.AddDays(-Blog.DaysToComment) || context.User.Identity.IsAuthenticated;
-    }
-
-    public int CountApprovedComments(HttpContextBase context)
-    {
-        return (Blog.ModerateComments && !context.User.Identity.IsAuthenticated) ? this.Comments.Count(c => c.IsApproved) : this.Comments.Count;
-    }
-
-    //public Uri GetCommentUri()
-    //{
-    //    var hashComment = Blog.CommentEngine.GetCommentUriHash();
-    //    var uri = new Uri(VirtualPathUtility.ToAbsolute("~/post/" + Slug + "#" + hashComment), UriKind.Relative);
-    //    return uri;
-    //}
 }

@@ -153,7 +153,7 @@ public static class Storage
             };
 
             LoadCategories(post, doc);
-            LoadComments(post, doc);
+            post.Comments.AddRange(Blog.CommentEngine.LoadComments(doc));
             list.Add(post);
         }
 
@@ -179,12 +179,16 @@ public static class Storage
 
         post.Categories = list.ToArray();
     }
-    private static void LoadComments(Post post, XElement doc)
+
+    public static IEnumerable<Comment> LoadComments(XElement doc)
     {
         var comments = doc.Element("comments");
+        var commentList = new List<Comment>();
 
         if (comments == null)
-            return;
+        {
+            return commentList;
+        }
 
         foreach (var node in comments.Elements("comment"))
         {
@@ -202,8 +206,9 @@ public static class Storage
                 PubDate = DateTime.Parse(ReadValue(node, "date", "2000-01-01")),
             };
 
-            post.Comments.Add(comment);
+            commentList.Add(comment);
         }
+        return commentList;
     }
 
     private static string ReadValue(XElement doc, XName name, string defaultValue = "")

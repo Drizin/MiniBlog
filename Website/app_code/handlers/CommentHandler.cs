@@ -42,7 +42,7 @@ public class CommentHandler : IHttpHandler
     {
         Blog.ValidateToken(context);
 
-        if (!post.AreCommentsOpen(new HttpContextWrapper(context)))
+        if (!Blog.CommentEngine.AreCommentsOpen(post, new HttpContextWrapper(context)))
             throw new HttpException(403, "The data token doesn't match or comments are closed");
 
         string name = context.Request.Form["name"];
