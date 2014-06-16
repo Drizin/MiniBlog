@@ -19,6 +19,7 @@ public static class Blog
         DaysToComment = int.Parse(ConfigurationManager.AppSettings.Get("blog:daysToComment"));
         Image = ConfigurationManager.AppSettings.Get("blog:image");
         ModerateComments = bool.Parse(ConfigurationManager.AppSettings.Get("blog:moderateComments"));
+        BlogPath = ConfigurationManager.AppSettings.Get("blog:path");
         GoogleAnalyticsId = ConfigurationManager.AppSettings.Get("blog:googleAnalyticsId");
         GoogleAnalyticsDomain = ConfigurationManager.AppSettings.Get("blog:googleAnalyticsDomain");
 
@@ -35,12 +36,13 @@ public static class Blog
     public static string GoogleAnalyticsId { get; set; }
     public static string GoogleAnalyticsDomain { get; set; }
     public static ICommentEngine CommentEngine { get; set; }
+    public static string BlogPath { get; private set; }
 
     public static bool IsGoogleAnalyticsConfigured
     {
         get { return !string.IsNullOrEmpty(GoogleAnalyticsId) && !string.IsNullOrEmpty(GoogleAnalyticsDomain); }
-    }
-
+    }    
+    
     public static string CurrentSlug
     {
         get { return (HttpContext.Current.Request.QueryString["slug"] ?? string.Empty).Trim().ToLowerInvariant(); }
@@ -53,7 +55,10 @@ public static class Blog
 
     public static bool IsNewPost
     {
-        get { return HttpContext.Current.Request.RawUrl.Trim('/') == "post/new"; }
+        get
+        {
+            return HttpContext.Current.Request.RawUrl.Trim('/') == (!string.IsNullOrWhiteSpace(BlogPath) ? BlogPath + "/" : "") + "post/new";
+    }
     }
 
 
@@ -140,9 +145,7 @@ public static class Blog
 
     public static void ValidateToken(HttpContext context)
     {
-        string token = context.Request.Form["token"];
-        var cookie = context.Request.Cookies.Get("__RequestVerificationToken");
-        AntiForgery.Validate(cookie.Value, token);
+        AntiForgery.Validate();
     }
 
     public static string SaveFileToDisk(byte[] bytes, string extension)
@@ -174,10 +177,11 @@ public static class Blog
 
     public static string FingerPrint(string rootRelativePath, string cdnPath = "")
     {
+        if (HttpContext.Current.Request.IsLocal)
+            return rootRelativePath;
+
         if (!string.IsNullOrEmpty(cdnPath) && !HttpContext.Current.IsDebuggingEnabled)
-        {
             return cdnPath;
-        }
 
         if (HttpRuntime.Cache[rootRelativePath] == null)
         {
@@ -185,14 +189,12 @@ public static class Blog
             string absolute = HostingEnvironment.MapPath(relative);
 
             if (!File.Exists(absolute))
-            {
                 throw new FileNotFoundException("File not found", absolute);
-            }
 
             DateTime date = File.GetLastWriteTime(absolute);
-            int index = relative.LastIndexOf('/');
+            int index = relative.LastIndexOf('.');
 
-            string result = relative.Insert(index, "/v-" + date.Ticks);
+            string result = ConfigurationManager.AppSettings.Get("blog:cdnUrl") + relative.Insert(index, "_" + date.Ticks);
 
             HttpRuntime.Cache.Insert(rootRelativePath, result, new CacheDependency(absolute));
         }
@@ -219,4 +221,19 @@ public static class Blog
             response.SuppressContent = true;
         }
     }
+
+    public static Dictionary<string, int> GetCategories()
+    {
+        var categoryStrings = Storage.GetAllPosts().SelectMany(x => x.Categories).ToList().Distinct();
+        var result = new Dictionary<string, int>();
+        foreach (var cat in categoryStrings)
+        {
+            result.Add(cat,
+                Storage.GetAllPosts().Where(p => p.Categories.Any(c => string.Equals(c, cat, StringComparison.OrdinalIgnoreCase))).Count()
+            );
+        }
+
+        return result;
+    }
+
 }
