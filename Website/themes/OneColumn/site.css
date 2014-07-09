@@ -124,6 +124,15 @@ input[type], button, textarea {
     padding: .2em 0;
 }
 
+.post table {
+    border-collapse: collapse;
+}
+
+.post td, th {
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+}
+
 /*#endregion */
 
 /*#region Comments */
