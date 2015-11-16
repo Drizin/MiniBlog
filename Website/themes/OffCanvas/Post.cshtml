@@ -15,10 +15,9 @@ else
             </h1>
             <div>
                 <abbr title="@Model.PubDate.ToLocalTime()" itemprop="datePublished">@Model.PubDate.ToLocalTime().ToString("MMMM d. yyyy")</abbr>
-                <a href="@Model.Url#comments">
-                    <em class="glyphicon glyphicon-comment"></em>
-                    @Model.CountApprovedComments(Context) Comments
-                </a>
+                
+                @Blog.CommentEngine.RenderCommentCountSection(Model, HttpContext.Current);
+
                 @Categories()
             </div>
         </header>        
@@ -34,25 +33,7 @@ else
         <div itemprop="articleBody">@Html.Raw(Blog.IsEditing ? Model.Content : Model.GetHtmlContent())</div>
         @if (Blog.CurrentPost != null)
         {
-            <section id="comments" aria-label="Comments">
-                @if (Model.CountApprovedComments(Context) > 0)
-                {
-                    <h2>Comments</h2>
-                }
-
-                @foreach (Comment comment in Model.Comments)
-                {
-                    if (comment.IsApproved || !Blog.ModerateComments || Context.User.Identity.IsAuthenticated)
-                    {
-                        @RenderPage("Comment.cshtml", comment)
-                    }
-                }
-            </section>
-
-            if (Model.AreCommentsOpen(Context))
-            {
-                @RenderPage("~/views/CommentForm.cshtml")
-            }
+            @Blog.CommentEngine.RenderCommentSection(Model, HttpContext.Current)
         }
     </article>
 

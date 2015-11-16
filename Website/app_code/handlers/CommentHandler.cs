@@ -11,6 +11,12 @@ public class CommentHandler : IHttpHandler
 {
     public void ProcessRequest(HttpContext context)
     {
+        // Disable the CommentHandler if the inbuilt comment engine is not being used.
+        if (Blog.CommentEngine.Name.ToLower() != "inbuilt")
+        {
+            throw new HttpException(400, "The inbuilt comment engine is disabled.");
+        }
+
         Post post = Storage.GetAllPosts().FirstOrDefault(p => p.ID == context.Request["postId"]);
 
         if (post == null)
@@ -36,7 +42,7 @@ public class CommentHandler : IHttpHandler
     {
         Blog.ValidateToken(context);
 
-        if (!post.AreCommentsOpen(new HttpContextWrapper(context)))
+        if (!Blog.CommentEngine.AreCommentsOpen(post, new HttpContextWrapper(context)))
             throw new HttpException(403, "The data token doesn't match or comments are closed");
 
         string name = context.Request.Form["name"];
@@ -72,7 +78,7 @@ public class CommentHandler : IHttpHandler
 
     private static void RenderComment(HttpContext context, Comment comment)
     {
-        var page = (WebPage)WebPageBase.CreateInstanceFromVirtualPath("~/themes/" + Blog.Theme + "/comment.cshtml");
+        var page = (WebPage)WebPageBase.CreateInstanceFromVirtualPath("~/views/commentengines/inbuilt/comment.cshtml");
         page.Context = new HttpContextWrapper(context);
         page.ExecutePageHierarchy(new WebPageContext(page.Context, page: null, model: comment), context.Response.Output);
     }

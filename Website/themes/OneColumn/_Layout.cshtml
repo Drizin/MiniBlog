@@ -17,6 +17,11 @@
     <link rel="stylesheet" href="@Blog.FingerPrint("/Content/bootstrap.css", "//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css")" />
     <link rel="stylesheet" href="@Blog.FingerPrint("/themes/" + Blog.Theme + "/site.css")" />
     <link rel="shortcut icon" href="@Blog.FingerPrint("/favicon.ico")" type="image/x-icon" />
+    
+    <!--Syntax Highlighter styles -->
+    <link href="@Blog.FingerPrint("/css/vendor/sh/shCore.css")" rel="stylesheet" />
+    <link href="@Blog.FingerPrint("/css/vendor/sh/shCoreDefault.css")" rel="stylesheet" />
+
     <link rel="dns-prefetch" href="http://gravatar.com/" />
 
     @AdminCss()
@@ -45,7 +50,7 @@
             <em>@Blog.Description</em>
         </header>
 
-        <div role="main" class="col-md-8 col-md-offset-2">
+        <div role="main" class="col-md-10 col-md-offset-1">
             @RenderBody()
 
             @if (Page.ShowPaging != null)
@@ -74,20 +79,41 @@
         }
         <span>
             Copyright &copy; @DateTime.Now.Year
-            <a href="http://madskristensen.net" itemprop="url name">Mads Kristensen</a>
+            <a href="http://www.gregpakes.co.uk" itemprop="url name">Greg Pakes</a>
         </span>
     </footer>
 
 
-    @if ((Blog.CurrentPost != null && Blog.CurrentPost.AreCommentsOpen(Context)) || Blog.IsNewPost)
+    @if ((Blog.CurrentPost != null && Blog.CommentEngine.AreCommentsOpen(Blog.CurrentPost,Context)) || Blog.IsNewPost)
     {
         <script src="@Blog.FingerPrint("/scripts/comments.js")" async defer></script>
     }
+    
+
+    @if (!Blog.IsEditing)
+    {
+        <script src="~/scripts/vendor/sh/shCore.js"></script>
+        <script src="~/scripts/vendor/sh/shBrushJScript.js"></script>
+        <script src="~/scripts/vendor/sh/shBrushSql.js"></script>
+        <script src="~/scripts/vendor/sh/shBrushPowerShell.js"></script>
+        <script src="~/scripts/vendor/sh/shBrushXml.js"></script>
+        <script src="~/scripts/vendor/sh/shBrushCSharp.js"></script>
+        <script src="~/scripts/vendor/sh/shBrushCss.js"></script>
+        <script src="~/scripts/vendor/sh/shBrushVb.js"></script>
+
+        <script type="text/javascript">
+        SyntaxHighlighter.config.bloggerMode = true;
+        SyntaxHighlighter.all()
+        </script>
+    }
+
 
     @if (User.Identity.IsAuthenticated)
     {
         @RenderPage("~/views/AdminMenu.cshtml")
     }
+    
+    @RenderPage("~/views/GA.cshtml")
 
 </body>
 </html>

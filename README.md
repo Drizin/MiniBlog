@@ -1,3 +1,18 @@
+# MiniBlog - www.gregpakes.co.uk
+
+Fork of MiniBlog that is running my site: www.gregpakes.co.uk.  I have made some minor customisations to it, they are outlined below.
+
+## Added Features
+
+- Google Analytics Support
+- Basic URL mapping system from wordpress.  Maps old blog URLs to new location.
+- Slight styling tweaks
+- SyntaxHighlighter support
+- Disqus support
+- Basic framework to support any comment engine
+
+----
+
 # MiniBlog
 
 A blogging engine based on HTML5 and ASP.NET.

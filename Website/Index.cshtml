@@ -47,7 +47,9 @@
     
     @AntiForgery.GetHtml()
 
-    if ( !Request.IsLocal && !User.Identity.IsAuthenticated )
+    @Blog.CommentEngine.RenderGlobalSection(HttpContext.Current)
+
+    if (!Request.IsLocal && !User.Identity.IsAuthenticated)
     {
         Response.Cache.AppendCacheExtension("max-age=0");
         Response.Cache.SetValidUntilExpires(true);
@@ -59,7 +61,7 @@
         Response.AddCacheDependency(new CacheDependency(Server.MapPath("~/Content")));
         Response.AddCacheDependency(new CacheDependency(Server.MapPath("~/themes/" + Blog.Theme)));
 
-        
+
         Blog.SetConditionalGetHeaders(lastModified.ToLocalTime(), Context);
     }
 }

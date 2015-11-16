@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Web;
 using System.Web.Hosting;
 using System.Xml.Linq;
@@ -12,6 +13,11 @@ public static class Storage
 
     public static List<Post> GetAllPosts()
     {
+        if (HttpRuntime.Cache["oldPostMap"] == null)
+        {
+            LoadOldPostMap();
+        }
+
         if (HttpRuntime.Cache["posts"] == null)
             LoadPosts();
 
@@ -90,6 +96,44 @@ public static class Storage
         Blog.ClearStartPageCache();
     }
 
+    public static Post GetOldPost(string url)
+    {
+        var map = GetOldPostMap();
+        if (map.ContainsKey(url))
+        {
+            return GetAllPosts().SingleOrDefault(p => p.ID == map[url]);
+        }
+        return null;
+    }
+
+    public static Dictionary<string, string> GetOldPostMap()
+    {
+        GetAllPosts();
+
+        if (HttpRuntime.Cache["oldPostMap"] != null)
+        {
+            return (Dictionary<string, string>)HttpRuntime.Cache["oldPostMap"];
+        }
+        return new Dictionary<string, string>();
+    }
+
+    private static void LoadOldPostMap()
+    {
+        var map = new Dictionary<string, string>();
+        var mapFile = Path.Combine(_folder, "oldPosts.map");
+        if (File.Exists(mapFile))
+        {
+            var doc = XDocument.Load(mapFile);
+            foreach (var mapping in doc.Descendants("OldPost"))
+            {
+                var oldUrl = mapping.Attribute("oldUrl").Value;
+                var newId = mapping.Attribute("postId").Value;
+                map[oldUrl] = newId;
+            }
+        }
+        HttpRuntime.Cache.Insert("oldPostMap", map);
+    }
+
     private static void LoadPosts()
     {
         if (!Directory.Exists(_folder))
@@ -116,7 +160,7 @@ public static class Storage
             };
 
             LoadCategories(post, doc);
-            LoadComments(post, doc);
+            post.Comments.AddRange(Blog.CommentEngine.LoadComments(doc));
             list.Add(post);
         }
 
@@ -142,12 +186,16 @@ public static class Storage
 
         post.Categories = list.ToArray();
     }
-    private static void LoadComments(Post post, XElement doc)
+
+    public static IEnumerable<Comment> LoadComments(XElement doc)
     {
         var comments = doc.Element("comments");
+        var commentList = new List<Comment>();
 
         if (comments == null)
-            return;
+        {
+            return commentList;
+        }
 
         foreach (var node in comments.Elements("comment"))
         {
@@ -165,8 +213,9 @@ public static class Storage
                 PubDate = DateTime.Parse(ReadValue(node, "date", "2000-01-01")),
             };
 
-            post.Comments.Add(comment);
+            commentList.Add(comment);
         }
+        return commentList;
     }
 
     private static string ReadValue(XElement doc, XName name, string defaultValue = "")
@@ -184,4 +233,6 @@ public static class Storage
 
         return defaultValue;
     }
+
+
 }

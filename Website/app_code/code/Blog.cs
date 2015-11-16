@@ -21,6 +21,9 @@ public static class Blog
         Image = ConfigurationManager.AppSettings.Get("blog:image");
         ModerateComments = bool.Parse(ConfigurationManager.AppSettings.Get("blog:moderateComments"));
         BlogPath = ConfigurationManager.AppSettings.Get("blog:path");
+        GoogleAnalyticsId = ConfigurationManager.AppSettings.Get("blog:googleAnalyticsId");
+        GoogleAnalyticsDomain = ConfigurationManager.AppSettings.Get("blog:googleAnalyticsDomain");
+        CommentEngine = CommentEngineFactory.Create(ConfigurationManager.AppSettings.Get("blog:commentEngine"));
     }
 
     public static string Title { get; private set; }
@@ -30,7 +33,14 @@ public static class Blog
     public static int PostsPerPage { get; private set; }
     public static int DaysToComment { get; private set; }
     public static bool ModerateComments { get; private set; }
+    public static string GoogleAnalyticsId { get; set; }
+    public static string GoogleAnalyticsDomain { get; set; }
+    public static ICommentEngine CommentEngine { get; set; }
     public static string BlogPath { get; private set; }
+    public static bool IsGoogleAnalyticsConfigured
+    {
+        get { return !string.IsNullOrEmpty(GoogleAnalyticsId) && !string.IsNullOrEmpty(GoogleAnalyticsDomain); }
+    }
 
     public static string CurrentSlug
     {
